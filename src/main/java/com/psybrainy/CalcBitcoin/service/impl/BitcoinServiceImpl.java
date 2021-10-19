@@ -7,17 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.time.Duration;
 
 @Service
 public class BitcoinServiceImpl implements BitcoinService {
 
     @Autowired
-    private BitcoinApi repo;
+    private BitcoinApi bitcoinApi;
 
     public Flux<BitcoinDto> getBitcoin(){
 
-        return repo.getBitcoin().delaySubscription(Duration.ofSeconds(1)).repeat();
+        return bitcoinApi.getBitcoin();
     }
 
 
