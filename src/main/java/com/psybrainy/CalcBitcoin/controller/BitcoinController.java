@@ -1,5 +1,6 @@
 package com.psybrainy.CalcBitcoin.controller;
 
+import com.psybrainy.CalcBitcoin.dto.BitcoinCalcDto;
 import com.psybrainy.CalcBitcoin.dto.BitcoinDto;
 import com.psybrainy.CalcBitcoin.service.BitcoinService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,10 @@ public class BitcoinController {
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<BitcoinDto> getBitcoin(){
         return repo.getBitcoin();
+    }
+
+    @GetMapping(path = "/calc" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<BitcoinCalcDto> getCalc(){
+        return repo.getCalc();
     }
 }
