@@ -1,8 +1,7 @@
 # BitcoinCalc
 
 > La experiencia es algo maravilloso, nos permite reconocer un error cada vez que lo volvemos a cometer
-
-> -Franklin P. Jones
+> - Franklin P. Jones
 
 **Presentacion:**
 BitcoinCalc es una API Rest capaz de tomar el valor del bitcoin en dolares y calcular el promedio, valor maximo y direrencia porsentual.
@@ -29,7 +28,7 @@ Contamos con 2 endpoints de peticiones GET, sin parametros y como un evento de s
       `curl http://localhost:8080/bitcoin`
       Este nos devuelve el valor actual del Bitcoin cada 10 segundos.
 
-* Ejecucion de getCalc:
+* Ejecucion de *getCalc*:
     * Utilizamos el comando:
       `curl http://localhost:8080/bitcoin/calc`
       Este nos devuelve el el valor maximo registrado en memoria, la diferencia porsentual entre ellos y el momento en el que esta peticion fue actualizada.
