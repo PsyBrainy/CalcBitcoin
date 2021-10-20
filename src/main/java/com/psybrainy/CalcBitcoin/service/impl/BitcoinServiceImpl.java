@@ -37,22 +37,27 @@ public class BitcoinServiceImpl implements BitcoinService {
                 .take(2)
                 .collect(Collectors.maxBy(Comparator.comparing(BitcoinDto::getLprice)))
                 .mapNotNull(Optional::orElseThrow)
-                .flatMap(c -> Mono.just(c.getLprice()))
-                .doOnNext(aDouble -> {
-                    BitcoinMayorEntity bitcoinMayor = new BitcoinMayorEntity();
+                .flatMap(dto -> Mono.just(dto.getLprice()))
+                .doOnNext(valorActual -> {
+                    // Toma el valor actual del bitcoin y si es mayor al registrado, lo actualiza
 
-                    BitcoinMayorEntity bitcoinPersistence = repo.findAll().stream().max(Comparator.comparing(BitcoinMayorEntity::getValorMaximo)).orElse(new BitcoinMayorEntity(1L, 0.0));
+                    BitcoinMayorEntity bitcoinActual = new BitcoinMayorEntity();
 
-                    bitcoinMayor.setValorMaximo(aDouble);
-                    bitcoinMayor.setId(bitcoinMayor.getId());
+                    BitcoinMayorEntity bitcoinPersistence = repo.findAll().stream()
+                            .max(Comparator.comparing(BitcoinMayorEntity::getValorMaximo))
+                            .orElse(new BitcoinMayorEntity(1L, 0.0));
 
-                    if(aDouble > bitcoinPersistence.getValorMaximo() && bitcoinPersistence.getValorMaximo() != null){
-                        repo.save(bitcoinMayor);
+                    bitcoinActual.setValorMaximo(valorActual);
+                    bitcoinActual.setId(bitcoinPersistence.getId());
+
+                    if(valorActual > bitcoinPersistence.getValorMaximo() && bitcoinPersistence.getValorMaximo() != null){
+                        repo.save(bitcoinActual);
                     }
                 }).map(aDouble -> repo
                         .findAll()
                         .stream()
-                        .max(Comparator.comparing(BitcoinMayorEntity::getValorMaximo)).orElse(new BitcoinMayorEntity())
+                        .max(Comparator.comparing(BitcoinMayorEntity::getValorMaximo))
+                        .orElse(new BitcoinMayorEntity())
                         .getValorMaximo())
                 .log();
     }
@@ -60,16 +65,12 @@ public class BitcoinServiceImpl implements BitcoinService {
     @Override
     public Flux<BitcoinCalcDto> getCalc() {
 
-
-        Flux<BitcoinDto> bitcoinDtoFlux = Flux.merge(getBitcoin());
-
         BitcoinCalcDto bitcoinCalcDto = new BitcoinCalcDto();
 
-        Mono<Double> promedioUltimoTimestamp = Flux.merge(bitcoinDtoFlux)
+        Mono<Double> promedioUltimoTimestamp = Flux.merge(getBitcoin())
                 .take(2)
-                .collect(Collectors.averagingDouble(BitcoinDto::getLprice)).log();
-
-
+                .collect(Collectors.averagingDouble(BitcoinDto::getLprice))
+                .log();
 
         return Flux.zip(promedioUltimoTimestamp, valorMaximo(),
 
@@ -78,15 +79,16 @@ public class BitcoinServiceImpl implements BitcoinService {
                     bitcoinCalcDto.setPromedioUltimoTimestamp(promedio);
                     bitcoinCalcDto.setValorMaximoRegistrado(valorMax);
 
+
                     Double diferenciaPorcentual = ((promedio - valorMax) / promedio)*100;
 
-                    bitcoinCalcDto.setDiferenciaPorcentual("%" + diferenciaPorcentual);
-                    bitcoinCalcDto.setActual(new Timestamp(System.currentTimeMillis()));
+                    bitcoinCalcDto.setDiferenciaPorcentual("% " + String.format("%.3f", diferenciaPorcentual));
+                    bitcoinCalcDto.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
                     return bitcoinCalcDto;
                 }
-
-        ).repeat();
+        ).repeat()
+                .log();
 
     }
 }

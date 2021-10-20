@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BitcoinRepository extends JpaRepository<BitcoinMayorEntity, Long> {
 
-    BitcoinRepository findByValorMaximo(Double valorMaximo);
 }

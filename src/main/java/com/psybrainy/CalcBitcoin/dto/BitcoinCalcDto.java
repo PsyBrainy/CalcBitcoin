@@ -10,5 +10,5 @@ public class BitcoinCalcDto {
     private Double promedioUltimoTimestamp;
     private Double valorMaximoRegistrado;
     private String diferenciaPorcentual;
-    private Timestamp actual;
+    private Timestamp timestamp;
 }
