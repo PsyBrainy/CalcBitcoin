@@ -1,6 +1,6 @@
 # BitcoinCalc
 
-> La experiencia es algo maravilloso, nos permite reconocer un error cada vez que lo volvemos a cometer
+> "La experiencia es algo maravilloso, nos permite reconocer un error cada vez que lo volvemos a cometer"
 > - Franklin P. Jones
 
 **Presentacion:**
