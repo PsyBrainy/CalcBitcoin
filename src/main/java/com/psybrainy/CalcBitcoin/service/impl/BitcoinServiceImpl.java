@@ -79,7 +79,6 @@ public class BitcoinServiceImpl implements BitcoinService {
                     bitcoinCalcDto.setPromedioUltimoTimestamp(promedio);
                     bitcoinCalcDto.setValorMaximoRegistrado(valorMax);
 
-
                     Double diferenciaPorcentual = ((promedio - valorMax) / promedio)*100;
 
                     bitcoinCalcDto.setDiferenciaPorcentual("% " + String.format("%.3f", diferenciaPorcentual));
