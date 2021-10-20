@@ -26,6 +26,7 @@ public class BitcoinApi {
                 .bodyToFlux(String.class)
                 .repeatWhen(longFlux -> Flux.interval(Duration.ofSeconds(10)))
                 .map(responce -> new Gson().fromJson(responce, BitcoinDto.class))
+                .retry()
                 .log();
     }
 }
