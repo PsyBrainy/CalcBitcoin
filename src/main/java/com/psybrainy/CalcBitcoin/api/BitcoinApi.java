@@ -2,11 +2,13 @@ package com.psybrainy.CalcBitcoin.api;
 
 import com.google.gson.Gson;
 import com.psybrainy.CalcBitcoin.dto.BitcoinDto;
+import com.psybrainy.CalcBitcoin.exceptions.NotFoudException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
@@ -26,6 +28,7 @@ public class BitcoinApi {
                 .bodyToFlux(String.class)
                 .repeatWhen(longFlux -> Flux.interval(Duration.ofSeconds(10)))
                 .map(responce -> new Gson().fromJson(responce, BitcoinDto.class))
+                .onErrorResume(e -> Mono.error(new NotFoudException(e.getMessage())))
                 .retry()
                 .log();
     }

@@ -3,6 +3,7 @@ package com.psybrainy.CalcBitcoin.service.impl;
 import com.psybrainy.CalcBitcoin.api.BitcoinApi;
 import com.psybrainy.CalcBitcoin.dto.BitcoinCalcDto;
 import com.psybrainy.CalcBitcoin.dto.BitcoinDto;
+import com.psybrainy.CalcBitcoin.exceptions.NotFoudException;
 import com.psybrainy.CalcBitcoin.persistence.BitcoinRepository;
 import com.psybrainy.CalcBitcoin.persistence.entity.BitcoinMayorEntity;
 import com.psybrainy.CalcBitcoin.service.BitcoinService;
@@ -37,6 +38,7 @@ public class BitcoinServiceImpl implements BitcoinService {
                 .take(2)
                 .collect(Collectors.maxBy(Comparator.comparing(BitcoinDto::getLprice)))
                 .mapNotNull(Optional::orElseThrow)
+                .onErrorResume(e -> Mono.error(new NotFoudException(e.getMessage())))
                 .flatMap(dto -> Mono.just(dto.getLprice()))
                 .doOnNext(valorActual -> {
                     // Toma el valor actual del bitcoin y si es mayor al registrado, lo actualiza
@@ -57,7 +59,7 @@ public class BitcoinServiceImpl implements BitcoinService {
                         .findAll()
                         .stream()
                         .max(Comparator.comparing(BitcoinMayorEntity::getValorMaximo))
-                        .orElse(new BitcoinMayorEntity())
+                        .orElseThrow(() -> new NotFoudException("No se encontro valor maximo registrado"))
                         .getValorMaximo())
                 .log();
     }
@@ -70,6 +72,7 @@ public class BitcoinServiceImpl implements BitcoinService {
         Mono<Double> promedioUltimoTimestamp = Flux.merge(getBitcoin())
                 .take(2)
                 .collect(Collectors.averagingDouble(BitcoinDto::getLprice))
+                .onErrorResume(e -> Mono.error(new NotFoudException(e.getMessage())))
                 .log();
 
         return Flux.zip(promedioUltimoTimestamp, valorMaximo(),
@@ -86,7 +89,7 @@ public class BitcoinServiceImpl implements BitcoinService {
 
                     return bitcoinCalcDto;
                 }
-        ).repeat()
+        ).repeat().onErrorResume(e -> Mono.error(new NotFoudException(e.getMessage())))
                 .log();
 
     }
