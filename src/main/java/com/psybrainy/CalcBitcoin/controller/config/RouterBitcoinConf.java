@@ -32,6 +32,6 @@ public class RouterBitcoinConf {
                 .and(route(GET("/bitcoin/calc"),
                         req -> ok().contentType(MediaType.TEXT_EVENT_STREAM)
                                 .body(service.getCalc(),
-                                        BitcoinCalcDto.class)));
+                        BitcoinCalcDto.class)));
     }
 }
